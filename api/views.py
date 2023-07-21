@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
-from .serializers import PeriodSerializer
-from .models import Period
+from .serializers import PeriodSerializer, PersonSerializer
+from .models import Period, Person
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwner
@@ -27,3 +27,12 @@ class PeriodViewSet(viewsets.ModelViewSet):
         periods = Period.objects.filter(owner=request.user)
         serializer = self.get_serializer(periods, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+
+class PersonViewSet(viewsets.ModelViewSet):
+    queryset = Person.objects.all()
+    permission_classes = (IsAuthenticated, )
+    serializer_class = PersonSerializer
+
+    def perform_create(self, serializer):
+        serializer.save()
