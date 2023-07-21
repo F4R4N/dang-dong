@@ -7,23 +7,21 @@ import secrets
 
 
 class Period(models.Model):
-    slug = models.CharField(verbose_name=_("Slug"), unique=True, primary_key=True, max_length=256, editable=False, default=secrets.token_urlsafe(10))
+    slug = models.SlugField(verbose_name=_("Slug"), unique=True, primary_key=True, max_length=256, editable=False, default=secrets.token_urlsafe(10))
     name = models.CharField(verbose_name=_("Name"), max_length=100)
     start_date = models.DateTimeField(verbose_name=_("Start Date"), default=timezone.now)
     owner = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, verbose_name=_("Owner"), editable=False)
-    # TODO: trigger slug change on user username change
-
 
     def __str__(self):
         return self.name
-# TODO: check period name uniqueness in serializers based on owners period
 # TODO: add a method to calculate all expenses
 
 
 class Person(models.Model):
-    name = models.CharField(verbose_name=_("Name"), max_length=100)
+    slug = models.SlugField(verbose_name=_("Slug"), unique=True, primary_key=True, editable=False, default=secrets.token_urlsafe(10))
+    name = models.CharField(verbose_name=_("Name"), max_length=100, blank=False, null=False)
     user = models.ForeignKey(get_user_model(), blank=True, on_delete=models.DO_NOTHING, null=True, verbose_name=_("User"))
-    period = models.ForeignKey(Period, on_delete=models.DO_NOTHING, verbose_name=_("Period"))
+    period = models.ForeignKey(Period, on_delete=models.DO_NOTHING, verbose_name=_("Period"), null=False, blank=False)
     coefficient = models.IntegerField(verbose_name=_("Coefficient"), default=1, validators=[MinValueValidator(1)])
 
     def __str__(self):
