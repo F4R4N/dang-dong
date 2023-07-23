@@ -22,7 +22,6 @@ class Person(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=100, blank=False, null=False)
     user = models.ForeignKey(get_user_model(), blank=True, on_delete=models.DO_NOTHING, null=True, verbose_name=_("User"))
     period = models.ForeignKey(Period, on_delete=models.DO_NOTHING, verbose_name=_("Period"), null=False, blank=False)
-    coefficient = models.IntegerField(verbose_name=_("Coefficient"), default=1, validators=[MinValueValidator(1)])
 
     def __str__(self):
         return self.name
@@ -41,3 +40,14 @@ class Purchase(models.Model):
     def __str__(self):
         return self.name
 # NOTE: get owner of purchase and person with reverse access to period owner
+
+
+# NOTE EVERY PERSON PER PURCHASE CAN HAVE ONLY ONE COEFFICIENT !!!!!
+class Coefficient(models.Model):
+    slug = models.SlugField(verbose_name=_("Slug"), unique=True, primary_key=True, editable=False, default=generate_slug)
+    coefficient = models.IntegerField(verbose_name=_("Coefficient"), default=1, validators=[MinValueValidator(1)])
+    purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return self.coefficient
