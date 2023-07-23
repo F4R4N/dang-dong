@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
-from .serializers import PeriodSerializer, PersonSerializer
-from .models import Period, Person
+from .serializers import PeriodSerializer, PersonSerializer, PurchaseSerializer
+from .models import Period, Person, Purchase
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwner
@@ -36,3 +36,19 @@ class PersonViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def list(self, request):
+        persons = Person.objects.filter(period__owner=request.user)
+
+
+class PurchaseViewSet(viewsets.ModelViewSet):
+    queryset = Purchase.objects.all()
+    permission_classes = (IsAuthenticated, )
+    serializer_class = PurchaseSerializer
+
+    def perform_create(self, serializer):
+        serializer.save()
+    
