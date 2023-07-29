@@ -12,6 +12,7 @@ class PeriodViewSet(viewsets.ModelViewSet):
     queryset = Period.objects.all()
     permission_classes = (IsAuthenticated, IsOwner)
     serializer_class = PeriodSerializer
+    http_method_names = ["get", "post", "delete", "put"]
 
     def perform_create(self, serializer):
         serializer.save()
@@ -34,6 +35,7 @@ class PersonViewSet(viewsets.ModelViewSet):
     queryset = Person.objects.all()
     permission_classes = (IsAuthenticated, IsOwner)
     serializer_class = PersonSerializer
+    http_method_names = ["get", "post", "delete"]
 
     def perform_create(self, serializer):
         serializer.save()
