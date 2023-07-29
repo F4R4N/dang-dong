@@ -1,16 +1,21 @@
 from django.contrib import admin
-from .models import Period, Person, Purchase
+from .models import Period, Person, Purchase, Coefficient
 
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-	list_display = ("name", "user", "period", "coefficient")
+	list_display = ("name", "user", "owner",)
 
 
 @admin.register(Period)
 class PeriodAdmin(admin.ModelAdmin):
-	list_display = ("name", "start_date", "owner")
+	list_display = ("name", "slug", "start_date", "owner", "get_persons")
 
+	def get_persons(self, instance):
+		result = []
+		for person in instance.persons.all():
+			result.append(person.name)
+		return result
 
 @admin.register(Purchase)
 class PurchaseAdmin(admin.ModelAdmin):
@@ -21,3 +26,7 @@ class PurchaseAdmin(admin.ModelAdmin):
 		for person in instance.purchase_users.all():
 			result.append(person.name)
 		return result
+	
+@admin.register(Coefficient)
+class CoefficientAdmin(admin.ModelAdmin):
+	list_display = ("slug", "coefficient", "purchase", "person")
