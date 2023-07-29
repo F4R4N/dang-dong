@@ -57,9 +57,6 @@ class PeriodSerializer(serializers.ModelSerializer):
         instance.persons.set(validated_data.get("persons", instance.persons.all()))
         instance.save()
         return instance
-    
-    def get_related_persons(self, obj):
-        print(obj)
 
 
 class PurchaseSerializer(serializers.ModelSerializer):
@@ -73,12 +70,6 @@ class PurchaseSerializer(serializers.ModelSerializer):
             raise exceptions.PermissionDenied()
         return value
 
-    def validate_period(self, value):
-        request = self.context["request"]
-        if value.owner != request.user:
-            raise exceptions.PermissionDenied()
-        return value
-
     def validate_purchased_for_users(self, value):
         request = self.context["request"]
         for person in value:
@@ -86,8 +77,14 @@ class PurchaseSerializer(serializers.ModelSerializer):
                 raise exceptions.PermissionDenied()
         return value
 
+    def validate_period(self, value):
+        request = self.context["request"]
+        if value.owner != request.user:
+            raise exceptions.PermissionDenied()
+        return value
+
     def validate(self, attrs):
-        persons = attrs["period"].person_set.all()  # all persons tha are related to this period
+        persons = attrs["period"].persons.all()  # all persons tha are related to this period
         if attrs.get("buyer") not in persons:
             raise serializers.ValidationError(ERROR_MESSAGES["not_period_member"])
         for user in attrs.get("purchased_for_users"):
@@ -100,3 +97,6 @@ class PurchaseSerializer(serializers.ModelSerializer):
         purchase = Purchase.objects.create(**validated_data)
         purchase.purchased_for_users.set(purchased_for_users)
         return purchase
+
+    # def update(self, instance, validated_data):
+        

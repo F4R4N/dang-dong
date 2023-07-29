@@ -23,7 +23,7 @@ class PurchaseAdmin(admin.ModelAdmin):
 	
 	def get_purchase_users(self, instance):
 		result = []
-		for person in instance.purchase_users.all():
+		for person in instance.purchased_for_users.all():
 			result.append(person.name)
 		return result
 	

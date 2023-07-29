@@ -41,7 +41,7 @@ class Purchase(models.Model):
     def __str__(self):
         return self.name
 # NOTE: get owner of purchase and person with reverse access to period owner
-
+# NOTE: REMEMBER TO CHECK PERSON DELETATION AND WHAT HAPPENS TO THE OBJECTS RELATED.
 
 # NOTE EVERY PERSON PER PURCHASE CAN HAVE ONLY ONE COEFFICIENT !!!!!
 class Coefficient(models.Model):
