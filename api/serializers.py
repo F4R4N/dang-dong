@@ -3,6 +3,12 @@ from .models import Period, Person, Purchase, PurchaseMembership
 from .responses import ERROR_MESSAGES
 
 
+class PurchaseSerializerForRead(serializers.ModelSerializer):
+    class Meta:
+        model = Purchase
+        fields = ("slug", "buyer", "name", "expense", "date_and_time")
+
+
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
@@ -60,8 +66,8 @@ class PeriodSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        serializer = PersonSerializer(instance.persons.all(), many=True)
-        representation["persons"] = serializer.data
+        person_serializer = PersonSerializer(instance.persons.all(), many=True)
+        representation["persons"] = person_serializer.data
         return representation
 
 
@@ -156,5 +162,15 @@ class PurchaseSerializer(serializers.ModelSerializer):
         instance.expense = validated_data.get("expense", instance.expense)
         instance.buyer = validated_data.get("buyer", instance.buyer)
         for user_data in validated_data.get("purchased_for_users"):
-            print(user_data)
-        # instance.purchased_for_users =
+            try:
+                purchase_membership = PurchaseMembership.objects.get(purchase=instance, person=user_data.get("person"))
+                purchase_membership.coefficient = user_data.get("coefficient")
+                purchase_membership.save()
+            except PurchaseMembership.DoesNotExist:
+                purchase_membership = PurchaseMembership.objects.create(
+                    coefficient=user_data.get("coefficient"),
+                    person=user_data.get("person"),
+                    purchase=instance
+                )
+        instance.save()
+        return instance

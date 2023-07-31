@@ -1,6 +1,5 @@
 from rest_framework import viewsets, status
-from rest_framework.views import APIView
-from .serializers import PeriodSerializer, PersonSerializer, PurchaseSerializer
+from .serializers import PeriodSerializer, PersonSerializer, PurchaseSerializer, PurchaseSerializerForRead
 from .models import Period, Person, Purchase
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -31,6 +30,12 @@ class PeriodViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(periods, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
+    def retrieve(self, request, pk=None):
+        instance = get_object_or_404(Period, pk=pk)
+        period_serializer = PeriodSerializer(instance)
+        purchase_serializer = PurchaseSerializerForRead(instance.purchase_set.all(), many=True)
+        return Response(status=status.HTTP_200_OK, data={"period": period_serializer.data, "all_purchases": purchase_serializer.data})
+
 
 class PersonViewSet(viewsets.ModelViewSet):
     queryset = Person.objects.all()
@@ -40,10 +45,6 @@ class PersonViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
-
-    # FIXME: REMEMBER TO IMPLIMENT THIS, THE ONLY THING THA CAN BE EDITED SHOULD BE TEH COEFFICIENT OF COEFFICIENT OBJECT
-    # def perform_update(self, serializer):
-    #     serializer.save()
 
     def destroy(self, request, pk=None):
         instance = self.get_object()
@@ -63,7 +64,7 @@ class PurchaseViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
-    
+
     def list(self, request):
         if "period" not in request.data:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"period": ERROR_MESSAGES["required_field"]})
@@ -76,3 +77,10 @@ class PurchaseViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save()
+
+    def destroy(self, request, pk=None):
+        instance = self.get_object()
+        self.perform_destroy(instance=instance)
+        return Response(status=status.HTTP_204_NO_CONTENT, data={RESPONSE_MESSAGES["successfully_deleted"]})
+
+    # NOTE: REMEMBER TO ADD RETRIEVE FOR DETAIL SHIT IN A PURCHASE
