@@ -14,7 +14,6 @@ class Person(models.Model):
 
     def __str__(self):
         return self.name
-# TODO: check user name uniqueness in serializers based on users in "period"
 
 
 class Period(models.Model):
@@ -39,8 +38,8 @@ class Purchase(models.Model):
 
     def __str__(self):
         return self.name
-# NOTE: get owner of purchase and person with reverse access to period owner
-# NOTE: REMEMBER TO CHECK PERSON DELETATION AND WHAT HAPPENS TO THE OBJECTS RELATED.
+
+# NOTE: TODO: REMEMBER TO CHECK PERSON DELETATION AND WHAT HAPPENS TO THE OBJECTS RELATED.
 
 
 class PurchaseMembership(models.Model):
