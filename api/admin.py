@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Period, Person, Purchase, Coefficient
+from .models import Period, Person, Purchase
 
 
 @admin.register(Person)
@@ -17,6 +17,7 @@ class PeriodAdmin(admin.ModelAdmin):
 			result.append(person.name)
 		return result
 
+
 @admin.register(Purchase)
 class PurchaseAdmin(admin.ModelAdmin):
 	list_display = ("name", "date_and_time", "expense", "buyer", "get_purchase_users", "period")
@@ -26,7 +27,3 @@ class PurchaseAdmin(admin.ModelAdmin):
 		for person in instance.purchased_for_users.all():
 			result.append(person.name)
 		return result
-	
-@admin.register(Coefficient)
-class CoefficientAdmin(admin.ModelAdmin):
-	list_display = ("slug", "coefficient", "purchase", "person")
