@@ -35,7 +35,6 @@ class Purchase(models.Model):
     date_and_time = models.DateTimeField(default=timezone.now, verbose_name=_("Date and Time"))
     expense = models.PositiveBigIntegerField(verbose_name=_("Expense"))
     buyer = models.ForeignKey(Person, on_delete=models.PROTECT, verbose_name=_("Buyer"), related_name="purchase_set_buyer")
-    purchased_for_users = models.ManyToManyField(Person, verbose_name=_("Purchased For Users"))
     period = models.ForeignKey(Period, on_delete=models.CASCADE, verbose_name=_("Period"))
 
     def __str__(self):
@@ -43,12 +42,12 @@ class Purchase(models.Model):
 # NOTE: get owner of purchase and person with reverse access to period owner
 # NOTE: REMEMBER TO CHECK PERSON DELETATION AND WHAT HAPPENS TO THE OBJECTS RELATED.
 
-# NOTE EVERY PERSON PER PURCHASE CAN HAVE ONLY ONE COEFFICIENT !!!!!
-class Coefficient(models.Model):
+
+class PurchaseMembership(models.Model):
     slug = models.SlugField(verbose_name=_("Slug"), unique=True, primary_key=True, editable=False, default=generate_slug)
     coefficient = models.IntegerField(verbose_name=_("Coefficient"), default=1, validators=[MinValueValidator(1)])
-    purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE, related_name="purchased_for_users")
 
     def __str__(self) -> str:
-        return self.coefficient
+        return str(self.coefficient)
