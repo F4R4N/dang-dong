@@ -5,7 +5,8 @@ from .models import Period, Person, Purchase
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwner
-from .responses import RESPONSE_MESSAGES
+from .responses import RESPONSE_MESSAGES, ERROR_MESSAGES
+from django.shortcuts import get_object_or_404
 
 
 class PeriodViewSet(viewsets.ModelViewSet):
@@ -63,3 +64,15 @@ class PurchaseViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save()
     
+    def list(self, request):
+        if "period" not in request.data:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"period": ERROR_MESSAGES["required_field"]})
+        period = get_object_or_404(Period, slug=request.data["period"])
+        if period.owner != request.user:
+            return Response(status=status.HTTP_403_FORBIDDEN, data=ERROR_MESSAGES["permission_denied"])
+        purchases = Purchase.objects.filter(period=period)
+        serializer = PurchaseSerializer(purchases, many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+    def perform_update(self, serializer):
+        serializer.save()
