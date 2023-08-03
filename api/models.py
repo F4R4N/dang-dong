@@ -38,6 +38,7 @@ class Purchase(models.Model):
 
     def __str__(self):
         return self.name
+    
 
 # NOTE: TODO: REMEMBER TO CHECK PERSON DELETATION AND WHAT HAPPENS TO THE OBJECTS RELATED.
 
@@ -45,7 +46,7 @@ class Purchase(models.Model):
 class PurchaseMembership(models.Model):
     slug = models.SlugField(verbose_name=_("Slug"), unique=True, primary_key=True, editable=False, default=generate_slug)
     coefficient = models.IntegerField(verbose_name=_("Coefficient"), default=1, validators=[MinValueValidator(1)])
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
     purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE, related_name="purchased_for_users")
 
     def __str__(self) -> str:
