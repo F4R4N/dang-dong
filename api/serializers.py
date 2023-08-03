@@ -149,7 +149,6 @@ class PurchaseSerializer(serializers.ModelSerializer):
         buyer_serializer = PersonSerializer(instance.buyer)
         period_serializer = PeriodSerializer(instance.period)
         purchased_for_users_serializer = PurchaseMemberShipSerializerForRead(instance.purchased_for_users.all(), many=True)
-
         representation["buyer"] = buyer_serializer.data
         representation["period"] = period_serializer.data
         representation["purchased_for_users"] = purchased_for_users_serializer.data
@@ -174,3 +173,16 @@ class PurchaseSerializer(serializers.ModelSerializer):
                 )
         instance.save()
         return instance
+
+
+class InDebtAndCreditedSerializer(serializers.Serializer):
+    person = PersonSerializer()
+    amount = serializers.IntegerField()
+
+
+class CustomPurchaseDetailSerializer(serializers.Serializer):
+    person = PersonSerializer()
+    owe_to = InDebtAndCreditedSerializer(many=True)
+    direct_cost = serializers.IntegerField()
+    final_cost = serializers.IntegerField()
+    creditor_of = InDebtAndCreditedSerializer(many=True)
