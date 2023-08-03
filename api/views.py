@@ -1,9 +1,12 @@
 from rest_framework import viewsets, status
-from .serializers import PeriodSerializer, PersonSerializer, PurchaseSerializer, PurchaseSerializerForRead
+from .serializers import PeriodSerializer, PersonSerializer, PurchaseSerializer, PurchaseSerializerForRead, PurchaseMembership, CustomPurchaseDetailSerializer
 from .models import Period, Person, Purchase
 from rest_framework.response import Response
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwner
+from django.db.models import Sum
 from .responses import RESPONSE_MESSAGES, ERROR_MESSAGES
 from django.shortcuts import get_object_or_404
 
@@ -61,6 +64,7 @@ class PurchaseViewSet(viewsets.ModelViewSet):
     queryset = Purchase.objects.all()
     permission_classes = (IsAuthenticated, )
     serializer_class = PurchaseSerializer
+    http_method_names = ["post", "get", "delete", "put"]
 
     def perform_create(self, serializer):
         serializer.save()
@@ -84,3 +88,46 @@ class PurchaseViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT, data={RESPONSE_MESSAGES["successfully_deleted"]})
 
     # NOTE: REMEMBER TO ADD RETRIEVE FOR DETAIL SHIT IN A PURCHASE
+
+
+class PurchaseExpenseDetail(APIView):
+    permission_classes = (IsAuthenticated,)
+    # http_method_names = ["get"]
+
+    def get(self, request, pk, format=None):
+        purchase = get_object_or_404(Purchase, pk=pk)
+        if purchase.period.owner != request.user:
+            return Response(status=status.HTTP_403_FORBIDDEN, data={"detail": ERROR_MESSAGES["permission_denied"]})
+        purchased_for_users = PurchaseMembership.objects.filter(purchase=purchase)
+        coefficient_sum = purchased_for_users.aggregate(Sum("coefficient"))["coefficient__sum"]
+        each_coefficient_share = purchase.expense / coefficient_sum
+        data = []
+        creditor_of = []
+        for purchased_for_user in purchased_for_users:
+            if purchased_for_user.person != purchase.buyer:
+                creditor_of.append({"person": purchased_for_user.person, "amount": each_coefficient_share * purchased_for_user.coefficient})
+            if purchased_for_user.person == purchase.buyer:
+                final_cost = 0
+                buyer_purchase_membership = purchased_for_users.filter(person=purchase.buyer)
+                if buyer_purchase_membership.exists():
+
+                    final_cost = each_coefficient_share * buyer_purchase_membership.first().coefficient
+                data.append({
+                    "person": purchase.buyer,
+                    "owe_to": [],
+                    "direct_cost": purchase.expense,
+                    "final_cost": final_cost,
+                    "creditor_of": creditor_of
+                })
+
+            else:
+                data.append({
+                    "person": purchased_for_user.person,
+                    "owe_to": [{"person": purchase.buyer, "amount": each_coefficient_share * purchased_for_user.coefficient}],
+                    "direct_cost": 0,
+                    "final_cost": each_coefficient_share * purchased_for_user.coefficient,
+                    "creditor_of": []
+                })
+        serializer = CustomPurchaseDetailSerializer(data, many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+# TODO: TRY TO CLEAN THIS AND BREAK IT TO MULTIPLE FUNCTIONS. AND TRY TO USE SERIALIZERS AND VIEWSETS INSTEAD
