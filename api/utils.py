@@ -1,13 +1,19 @@
 import secrets
-from django.db.models import Sum
-from django.apps import apps
+from django.db.models import Sum  # type: ignore
+from django.apps import apps  # type: ignore
+from typing import TYPE_CHECKING
+
+# TODO: ADD DJANGO STUB TO MYPY
+if TYPE_CHECKING:
+    from .models import Purchase
 
 
-def generate_slug():
+def generate_id() -> str:
+    """ generates a url-safe token to use as id in models. """
     return secrets.token_urlsafe(16)
 
 
-def purchase_detail_data_generator(person: object, owe_to: list, direct_cost: int, final_cost: int, creditor_of: list):
+def purchase_detail_data_generator(person: object, owe_to: list, direct_cost: int, final_cost: int, creditor_of: list) -> dict:
     return {
         "person": person,
         "owe_to": owe_to,
@@ -17,7 +23,7 @@ def purchase_detail_data_generator(person: object, owe_to: list, direct_cost: in
     }
 
 
-def purchase_detail_calculator(purchase: object):
+def purchase_detail_calculator(purchase: 'Purchase') -> list:
     PurchaseMembership = apps.get_model("api", "PurchaseMembership")
     data = []
     purchased_for_users_purchase_membership = PurchaseMembership.objects.filter(purchase=purchase)
@@ -37,7 +43,7 @@ def purchase_detail_calculator(purchase: object):
             final_cost=user_payment_share,
             creditor_of=[]
         ))
-    buyer_purchase_membership = PurchaseMembership.objects.filter(person=purchase.buyer)
+    buyer_purchase_membership = PurchaseMembership.objects.filter(person=purchase.buyer, purchase=purchase)
     final_cost = 0
     if buyer_purchase_membership.exists():
         final_cost = each_coefficient_share * buyer_purchase_membership.first().coefficient
