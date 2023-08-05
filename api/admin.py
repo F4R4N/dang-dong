@@ -9,7 +9,7 @@ class PersonAdmin(admin.ModelAdmin):
 
 @admin.register(Period)
 class PeriodAdmin(admin.ModelAdmin):
-	list_display = ("name", "slug", "start_date", "owner", "get_persons")
+	list_display = ("name", "id", "start_date", "owner", "get_persons")
 
 	def get_persons(self, instance):
 		result = []

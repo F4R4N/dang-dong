@@ -6,13 +6,13 @@ from .responses import ERROR_MESSAGES
 class PurchaseSerializerForRead(serializers.ModelSerializer):
     class Meta:
         model = Purchase
-        fields = ("slug", "buyer", "name", "expense", "date_and_time")
+        fields = ("id", "buyer", "name", "expense", "date_and_time")
 
 
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
-        fields = ("slug", "name", "user", "owner")
+        fields = ("id", "name", "user", "owner")
 
     def validate_name(self, value):
         request = self.context["request"]
@@ -28,7 +28,7 @@ class PersonSerializer(serializers.ModelSerializer):
 class PeriodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Period
-        fields = ("slug", "name", "start_date", "owner", "persons")  # TODO : follow up here
+        fields = ("id", "name", "start_date", "owner", "persons")
 
     def validate_name(self, value):
         request = self.context.get("request")
@@ -74,7 +74,7 @@ class PeriodSerializer(serializers.ModelSerializer):
 class PurchaseMemberShipSerializer(serializers.ModelSerializer):
     class Meta:
         model = PurchaseMembership
-        fields = ("slug", "coefficient", "person")
+        fields = ("id", "coefficient", "person")
 
 
 class PurchaseMemberShipSerializerForRead(serializers.ModelSerializer):
@@ -90,7 +90,7 @@ class PurchaseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Purchase
-        fields = ("slug", "name", "date_and_time", "expense", "buyer", "purchased_for_users", "period")
+        fields = ("id", "name", "date_and_time", "expense", "buyer", "purchased_for_users", "period")
 
     def validate_name(self, value):
         request = self.context.get("request")
@@ -142,7 +142,7 @@ class PurchaseSerializer(serializers.ModelSerializer):
                 person=person_data.get("person")
             )
             membership.save()
-        return purchase  # TODO: need to customize purchase object on return
+        return purchase
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -180,7 +180,7 @@ class InDebtAndCreditedSerializer(serializers.Serializer):
     amount = serializers.IntegerField()
 
 
-class CustomPurchaseDetailSerializer(serializers.Serializer):
+class DetailSerializer(serializers.Serializer):
     person = PersonSerializer()
     owe_to = InDebtAndCreditedSerializer(many=True)
     direct_cost = serializers.IntegerField()
