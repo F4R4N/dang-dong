@@ -55,3 +55,21 @@ def purchase_detail_calculator(purchase: 'Purchase') -> list:
         creditor_of=creditor_of
     ))
     return data
+
+
+def get_dict_index(lst: list, key: str, value: object) -> int:
+    for index, dic in enumerate(lst):
+        if dic[key] == value:
+            return index
+    return -1
+
+
+def owe_and_credit_calculator(owe_or_credits: list[dict[str, object | int]]) -> list[dict[str, object | int]]:
+    data: list[dict[str, object | int]] = []
+    for owe_or_credit in owe_or_credits:
+        if any(element["person"] == owe_or_credit["person"] for element in data):
+            index: int = get_dict_index(data, "person", owe_or_credit["person"])
+            data[index].update({"amount": data[index]["amount"] + owe_or_credit["amount"]})
+        else:
+            data.append(owe_or_credit)
+    return data
