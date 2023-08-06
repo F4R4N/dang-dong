@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = list(os.environ.get("ALLOWED_HOSTS").split(","))
+ALLOWED_HOSTS: list[str] = list(os.environ.get("ALLOWED_HOSTS", "127.0.0.1").split(", "))
 
 # Application definition
 
@@ -63,7 +63,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -134,6 +134,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+AUTH_USER_MODEL = 'customauth.User'
+
 LANGUAGES = [
     ("de", _("German")),
     ("en", _("English")),
@@ -157,8 +159,23 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=20),  # TODO: CHANGE IMPORTANT!!!!!
     'REFRESH_TOKEN_LIFETIME': timedelta(days=3),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
 }
+
+AUTH_CODE_EXPIRES_IN = timedelta(minutes=10)
+
+VERIFICATION_PATH = os.environ.get("VERIFICATION_PATH")
+
+APP_NAME = os.environ.get("APP_NAME")
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = os.environ.get("EMAIL_SMTP")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+
+EMAIL_PLAINTEXT_TEMPLATE_NAME = "email.txt"
+EMAIL_HTML_TEMPLATE_NAME = "email.html"
