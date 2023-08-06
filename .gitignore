@@ -162,3 +162,5 @@ cython_debug/
 migrations/
 *.code-workspace
 .vscode/
+mypy.ini
+test.html
