@@ -1,12 +1,13 @@
 from rest_framework import viewsets, status
-from .serializers import PeriodSerializer, PersonSerializer, PurchaseSerializer, PurchaseSerializerForRead, CustomPurchaseDetailSerializer
+from .serializers import PeriodSerializer, PersonSerializer, PurchaseSerializer, PurchaseSerializerForRead, DetailSerializer
 from .models import Period, Person, Purchase
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwner, IsPurchaseOwner
 from .responses import RESPONSE_MESSAGES, ERROR_MESSAGES
 from django.shortcuts import get_object_or_404
-from .utils import purchase_detail_calculator
+from .utils import purchase_detail_calculator, get_dict_index, owe_and_credit_calculator
+from rest_framework.request import Request
 
 
 class PeriodViewSet(viewsets.ModelViewSet):
@@ -26,16 +27,41 @@ class PeriodViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT, data={"detail": RESPONSE_MESSAGES["successfully_deleted"]})
 
-    def list(self, request):
-        periods = Period.objects.filter(owner=request.user)
+    def list(self, request: Request) -> Response:
+        periods = Period.objects.filter(owner=request.user)  # type: ignore
         serializer = self.get_serializer(periods, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
     def retrieve(self, request, pk=None):
-        instance = get_object_or_404(Period, pk=pk)
-        period_serializer = PeriodSerializer(instance)
-        purchase_serializer = PurchaseSerializerForRead(instance.purchase_set.all(), many=True)
-        return Response(status=status.HTTP_200_OK, data={"period": period_serializer.data, "all_purchases": purchase_serializer.data})
+        period = get_object_or_404(Period, pk=pk)
+        all_periods_purchases = period.purchase_set.all()
+        period_detail: list[dict[str, object | int | dict[str, int | object]]] = []
+        for purchase in all_periods_purchases:
+            purchase_detail_calculator_result = purchase_detail_calculator(purchase=purchase)
+            for person_detail in purchase_detail_calculator_result:
+                if any(element["person"] == person_detail["person"] for element in period_detail):  # True when person exist in period_detail (update())
+                    index = get_dict_index(period_detail, "person", person_detail["person"])
+                    period_detail[index].update({
+                        "direct_cost": period_detail[index]["direct_cost"] + person_detail["direct_cost"],
+                        "final_cost": period_detail[index]["final_cost"] + person_detail["final_cost"],
+                        "owe_to": period_detail[index]["owe_to"] + person_detail["owe_to"],
+                        "creditor_of": period_detail[index]["creditor_of"] + person_detail["creditor_of"]
+                    })
+                else:
+                    period_detail.append(person_detail)
+        for detail in period_detail:
+            owe_tos = owe_and_credit_calculator(detail["owe_to"])
+            creditor_ofs = owe_and_credit_calculator(detail["creditor_of"])
+            period_detail[period_detail.index(detail)].update({"owe_to": owe_tos})
+            period_detail[period_detail.index(detail)].update({"creditor_of": creditor_ofs})
+        detail_serializer = DetailSerializer(period_detail, many=True)
+        period_serializer = PeriodSerializer(period)
+        purchase_serializer = PurchaseSerializerForRead(all_periods_purchases, many=True)
+        return Response(status=status.HTTP_200_OK, data={
+            "period": period_serializer.data,
+            "all_purchases": purchase_serializer.data,
+            "detail": detail_serializer.data
+        })
 
 
 class PersonViewSet(viewsets.ModelViewSet):
@@ -70,7 +96,7 @@ class PurchaseViewSet(viewsets.ModelViewSet):
     def list(self, request):
         if "period" not in request.data:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"period": ERROR_MESSAGES["required_field"]})
-        period = get_object_or_404(Period, slug=request.data["period"])
+        period = get_object_or_404(Period, pk=request.data["period"])
         if period.owner != request.user:
             return Response(status=status.HTTP_403_FORBIDDEN, data=ERROR_MESSAGES["permission_denied"])
         purchases = Purchase.objects.filter(period=period)
@@ -89,8 +115,14 @@ class PurchaseViewSet(viewsets.ModelViewSet):
         purchase = get_object_or_404(Purchase, pk=pk)
         data = purchase_detail_calculator(purchase=purchase)
         purchase_serializer = self.get_serializer(self.get_object())
-        purchase_detail_serializer = CustomPurchaseDetailSerializer(data, many=True)
+        purchase_detail_serializer = DetailSerializer(data, many=True)
         return Response(status=status.HTTP_200_OK, data={"purchase": purchase_serializer.data, "detail": purchase_detail_serializer.data})
 
-    # NOTE: REMEMBER TO ADD RETRIEVE FOR DETAIL SHIT IN A PURCHASE
-
+    # TODO: ADD OBJECT CREATION LIMITATION FOR EACH USER
+    # TODO: ADD REQUEST LIMITATION FOR EACH USER
+    # TODO: DOCSTRING
+    # TODO: TYPE HINTING
+    # TODO: ADD COMMENTS TO DETAIL LOGICS
+    # TODO: LOCALIZATION TRANSLATION
+    # TODO: TEST
+    # TODO: CHECK PERSON DELETION LOGIC AND ITS PROTECTION
