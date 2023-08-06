@@ -1,0 +1,9 @@
+Hi Dear user {{ username }},
+
+{% if is_magic %}
+    click on: {{ url }}
+{% else %}
+    your code is : {{ code }}
+{% endif%}
+to access your account
+this link will expire in {{ expire_in_minutes }}  
