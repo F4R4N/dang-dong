@@ -75,8 +75,10 @@ class PersonViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         instance = self.get_object()
-        self.perform_destroy(instance=instance)
-        return Response(status=status.HTTP_204_NO_CONTENT, data={RESPONSE_MESSAGES["successfully_deleted"]})
+        if len(instance.period_set.all()) == 0:
+            self.perform_destroy(instance=instance)
+            return Response(status=status.HTTP_204_NO_CONTENT, data={RESPONSE_MESSAGES["successfully_deleted"]})
+        return Response(status=status.HTTP_403_FORBIDDEN, data={"detail": ERROR_MESSAGES["person_object_protected"]})
 
     def list(self, request):
         persons = Person.objects.filter(owner=request.user)
@@ -125,4 +127,3 @@ class PurchaseViewSet(viewsets.ModelViewSet):
     # TODO: ADD COMMENTS TO DETAIL LOGICS
     # TODO: LOCALIZATION TRANSLATION
     # TODO: TEST
-    # TODO: CHECK PERSON DELETION LOGIC AND ITS PROTECTION

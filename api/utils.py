@@ -3,7 +3,6 @@ from django.db.models import Sum  # type: ignore
 from django.apps import apps  # type: ignore
 from typing import TYPE_CHECKING
 
-# TODO: ADD DJANGO STUB TO MYPY
 if TYPE_CHECKING:
     from .models import Purchase
 
