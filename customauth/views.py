@@ -1,4 +1,6 @@
+from typing import Any
 from rest_framework import permissions, status
+from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -8,7 +10,8 @@ from .utils import auth_email
 import secrets
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken  # type: ignore
-from api.permissions import IsOwner
+from api.permissions import IsAuthorizedUser
+from api.responses import RESPONSE_MESSAGES
 from django.contrib.auth import get_user_model
 
 
@@ -89,21 +92,19 @@ class MagicLinkView(APIView):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = get_user_model().objects.all()
-    permission_classes = (permissions.IsAuthenticated, IsOwner)
+    permission_classes = (permissions.IsAuthenticated, IsAuthorizedUser)
     serializer_class = UserSerializer
     http_method_names = ["get", "put", "delete"]
 
     def perform_update(self, serializer):
         serializer.save()
 
-    # def destroy(self, request, *args, **kwargs):
-    #     return super().destroy(request, *args, **kwargs)
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance=instance)
+        return Response(status=status.HTTP_204_NO_CONTENT, data=RESPONSE_MESSAGES["successfully_deleted"])
 
-    # def retrieve(self, request, *args, **kwargs):
-    #     return super().retrieve(request, *args, **kwargs)
-
-
-# TODO: IMPLEMENT USER UPDATE
-# TODO: IMPLEMENT USER DELETE
-# TODO: IMPLEMENT USER RETRIEVE
-# TODO: TEST THE SHIT OUT OF AUTH APP
+    def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        user = request.user
+        serializer = self.get_serializer(user)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
