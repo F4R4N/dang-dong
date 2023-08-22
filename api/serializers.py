@@ -60,7 +60,15 @@ class PeriodSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.name = validated_data.get("name", instance.name)
         instance.star_date = validated_data.get("start_date", instance.start_date)
-        instance.persons.set(validated_data.get("persons", instance.persons.all()))
+        persons = validated_data.get("persons", instance.persons.all())
+        persons_in_purchases: set[object] = set()
+        for periods_purchase in instance.purchase_set.all():
+            for purchase_membership in periods_purchase.purchased_for_users.all():
+                persons_in_purchases.add(purchase_membership.person)
+            persons_in_purchases.add(periods_purchase.buyer)
+        if not persons_in_purchases.issubset(set(persons)):
+            raise serializers.ValidationError({"persons": ERROR_MESSAGES["person_object_protected"]})
+        instance.persons.set(persons)
         instance.save()
         return instance
 
