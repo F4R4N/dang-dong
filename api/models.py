@@ -32,7 +32,7 @@ class Purchase(models.Model):
     name = models.CharField(max_length=100, verbose_name=_("Name"))
     date_and_time = models.DateTimeField(default=timezone.now, verbose_name=_("Date and Time"))
     expense = models.PositiveBigIntegerField(verbose_name=_("Expense"))
-    buyer = models.ForeignKey(Person, on_delete=models.PROTECT, verbose_name=_("Buyer"), related_name="purchase_set_buyer")
+    buyer = models.ForeignKey(Person, on_delete=models.CASCADE, verbose_name=_("Buyer"), related_name="purchase_set_buyer")
     period = models.ForeignKey(Period, on_delete=models.CASCADE, verbose_name=_("Period"))
 
     def __str__(self):
@@ -42,10 +42,8 @@ class Purchase(models.Model):
 class PurchaseMembership(models.Model):
     id = models.SlugField(verbose_name=_("id"), unique=True, primary_key=True, editable=False, default=generate_id)
     coefficient = models.IntegerField(verbose_name=_("Coefficient"), default=1, validators=[MinValueValidator(1)])
-    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
     purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE, related_name="purchased_for_users")
 
     def __str__(self) -> str:
         return str(self.coefficient)
-
-# NOTE: TODO: REMEMBER TO CHECK PERSON DELETION AND WHAT HAPPENS TO THE OBJECTS RELATED.
