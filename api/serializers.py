@@ -3,12 +3,6 @@ from .models import Period, Person, Purchase, PurchaseMembership
 from .responses import ERROR_MESSAGES
 
 
-class PurchaseSerializerForRead(serializers.ModelSerializer):
-    class Meta:
-        model = Purchase
-        fields = ("id", "buyer", "name", "expense", "date_and_time")
-
-
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
@@ -23,6 +17,14 @@ class PersonSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         owner = self.context["request"].user
         return Person.objects.create(**validated_data, owner=owner)
+
+
+class PurchaseSerializerForRead(serializers.ModelSerializer):
+    buyer = PersonSerializer()
+
+    class Meta:
+        model = Purchase
+        fields = ("id", "buyer", "name", "expense", "date_and_time")
 
 
 class PeriodSerializer(serializers.ModelSerializer):
