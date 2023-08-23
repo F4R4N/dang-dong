@@ -15,7 +15,6 @@ class IsPurchaseOwner(permissions.BasePermission):
     purchases related periods owner is authenticated user or not.
     """
     def has_object_permission(self, request, view, obj):
-        print(obj.period.owner == request.user)
         return obj.period.owner == request.user
 
 
