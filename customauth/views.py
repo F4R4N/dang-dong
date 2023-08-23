@@ -1,5 +1,5 @@
 from typing import Any
-from rest_framework import permissions, status
+from rest_framework import permissions, status, mixins
 from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -78,7 +78,7 @@ class MagicLinkView(APIView):
         return Response(status=status.HTTP_200_OK, data=data)
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(mixins.UpdateModelMixin, mixins.DestroyModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = get_user_model().objects.all()
     permission_classes = (permissions.IsAuthenticated, IsAuthorizedUser)
     serializer_class = UserSerializer
