@@ -11,28 +11,34 @@ from rest_framework.request import Request
 
 
 class PeriodViewSet(viewsets.ModelViewSet):
+    """ perform create, update, destroy, list, retrieve actions on period object """
     queryset = Period.objects.all()
     permission_classes = (IsAuthenticated, IsOwner)
     serializer_class = PeriodSerializer
     http_method_names = ["get", "post", "delete", "put"]
 
     def perform_create(self, serializer):
+        """ creates a new period with the given data """
         serializer.save()
 
     def perform_update(self, serializer):
+        """ update the already existing period with the given data """
         serializer.save()
 
     def destroy(self, request, pk=None):
+        """ delete the period with the given id """
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT, data={"detail": RESPONSE_MESSAGES["successfully_deleted"]})
 
     def list(self, request: Request) -> Response:
+        """ list all periods of user """
         periods = Period.objects.filter(owner=request.user)  # type: ignore
         serializer = self.get_serializer(periods, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
     def retrieve(self, request, pk=None):
+        """ return detailed data about the period with the given id. including period info, purchases info and expenses detail. """
         period = get_object_or_404(Period, pk=pk)
         all_periods_purchases = period.purchase_set.all()
         period_detail: list[dict[str, object | int | dict[str, int | object]]] = []
