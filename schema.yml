@@ -6,7 +6,7 @@ paths:
   /v1/api/period/:
     get:
       operationId: listPeriods
-      description: ''
+      description: list all periods of user
       parameters: []
       responses:
         '200':
@@ -21,7 +21,8 @@ paths:
       - v1
     post:
       operationId: createPeriod
-      description: ''
+      description: perform create, update, destroy, list, retrieve actions on period
+        object
       parameters: []
       requestBody:
         content:
@@ -46,7 +47,8 @@ paths:
   /v1/api/period/{id}/:
     get:
       operationId: retrievePeriod
-      description: ''
+      description: return detailed data about the period with the given id. including
+        period info, purchases info and expenses detail.
       parameters:
       - name: id
         in: path
@@ -65,7 +67,8 @@ paths:
       - v1
     put:
       operationId: updatePeriod
-      description: ''
+      description: perform create, update, destroy, list, retrieve actions on period
+        object
       parameters:
       - name: id
         in: path
@@ -95,7 +98,7 @@ paths:
       - v1
     delete:
       operationId: destroyPeriod
-      description: ''
+      description: delete the period with the given id
       parameters:
       - name: id
         in: path
