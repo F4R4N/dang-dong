@@ -1,0 +1,621 @@
+openapi: 3.0.2
+info:
+  title: ''
+  version: ''
+paths:
+  /v1/api/period/:
+    get:
+      operationId: listPeriods
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Period'
+          description: ''
+      tags:
+      - v1
+    post:
+      operationId: createPeriod
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Period'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Period'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Period'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Period'
+          description: ''
+      tags:
+      - v1
+  /v1/api/period/{id}/:
+    get:
+      operationId: retrievePeriod
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique value identifying this period.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Period'
+          description: ''
+      tags:
+      - v1
+    put:
+      operationId: updatePeriod
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique value identifying this period.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Period'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Period'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Period'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Period'
+          description: ''
+      tags:
+      - v1
+    delete:
+      operationId: destroyPeriod
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique value identifying this period.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+      tags:
+      - v1
+  /v1/api/person/:
+    get:
+      operationId: listPersons
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+          description: ''
+      tags:
+      - v1
+    post:
+      operationId: createPerson
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Person'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Person'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+          description: ''
+      tags:
+      - v1
+  /v1/api/person/{id}/:
+    get:
+      operationId: retrievePerson
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique value identifying this person.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+          description: ''
+      tags:
+      - v1
+    delete:
+      operationId: destroyPerson
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique value identifying this person.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+      tags:
+      - v1
+  /v1/api/purchase/:
+    get:
+      operationId: listPurchases
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Purchase'
+          description: ''
+      tags:
+      - v1
+    post:
+      operationId: createPurchase
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Purchase'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Purchase'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Purchase'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Purchase'
+          description: ''
+      tags:
+      - v1
+  /v1/api/purchase/{id}/:
+    get:
+      operationId: retrievePurchase
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique value identifying this purchase.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Purchase'
+          description: ''
+      tags:
+      - v1
+    put:
+      operationId: updatePurchase
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique value identifying this purchase.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Purchase'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Purchase'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Purchase'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Purchase'
+          description: ''
+      tags:
+      - v1
+    delete:
+      operationId: destroyPurchase
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique value identifying this purchase.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+      tags:
+      - v1
+  /v1/auth/login/magic/:
+    get:
+      operationId: listMagicLinks
+      description: register or log in the user with magic link
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+          description: ''
+      tags:
+      - v1
+    post:
+      operationId: createMagicLink
+      description: register or log in the user with magic link
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+          application/x-www-form-urlencoded:
+            schema: {}
+          multipart/form-data:
+            schema: {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+      tags:
+      - v1
+  /v1/auth/login/magic/{code}/:
+    get:
+      operationId: retrieveMagicLink
+      description: register or log in the user with magic link
+      parameters:
+      - name: code
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+      tags:
+      - v1
+    post:
+      operationId: createMagicLink
+      description: register or log in the user with magic link
+      parameters:
+      - name: code
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+          application/x-www-form-urlencoded:
+            schema: {}
+          multipart/form-data:
+            schema: {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+      tags:
+      - v1
+  /v1/auth/user/:
+    get:
+      operationId: listUsers
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          description: ''
+      tags:
+      - v1
+  /v1/auth/user/{id}/:
+    get:
+      operationId: retrieveUser
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique value identifying this user.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+      tags:
+      - v1
+    put:
+      operationId: updateUser
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique value identifying this user.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+      tags:
+      - v1
+    delete:
+      operationId: destroyUser
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique value identifying this user.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+      tags:
+      - v1
+  /v1/auth/login/refresh/:
+    post:
+      operationId: createTokenRefresh
+      description: 'Takes a refresh type JSON web token and returns an access type
+        JSON web
+
+        token if the refresh token is valid.'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+      tags:
+      - v1
+  /v1/auth/logout/:
+    post:
+      operationId: createLogout
+      description: send the refresh token as refresh_token in data
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+          application/x-www-form-urlencoded:
+            schema: {}
+          multipart/form-data:
+            schema: {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+      tags:
+      - v1
+components:
+  schemas:
+    Period:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        name:
+          type: string
+          maxLength: 100
+        start_date:
+          type: string
+          format: date-time
+        owner:
+          type: string
+          readOnly: true
+        persons:
+          type: array
+          items:
+            type: string
+      required:
+      - name
+    Person:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        name:
+          type: string
+          maxLength: 100
+        user:
+          type: string
+          nullable: true
+        owner:
+          type: string
+          readOnly: true
+      required:
+      - name
+    Purchase:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        name:
+          type: string
+          maxLength: 100
+        date_and_time:
+          type: string
+          format: date-time
+        expense:
+          type: integer
+        buyer:
+          type: string
+        purchased_for_users:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                readOnly: true
+                pattern: ^[-a-zA-Z0-9_]+$
+              coefficient:
+                type: integer
+                minimum: 1
+              person:
+                type: string
+            required:
+            - person
+        period:
+          type: string
+      required:
+      - name
+      - expense
+      - buyer
+      - purchased_for_users
+      - period
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 100
+          pattern: ^[-a-zA-Z0-9_]+$
+        username:
+          type: string
+          pattern: ^[\w.@+-]+\z
+          maxLength: 250
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        is_active:
+          type: boolean
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        email:
+          type: string
+          format: email
+          maxLength: 254
+      required:
+      - username
+      - email
+    TokenRefresh:
+      type: object
+      properties:
+        refresh:
+          type: string
+        access:
+          type: string
+          readOnly: true
+      required:
+      - refresh
