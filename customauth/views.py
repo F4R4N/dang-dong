@@ -44,7 +44,6 @@ class MagicLinkView(APIView):
         if not serializer.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
         email = request.data["email"]
-
         try:
             user = get_user_model().objects.get(email=email)
             status_, data_ = auth_email(user)
@@ -56,17 +55,7 @@ class MagicLinkView(APIView):
                 is_active=True,
             )
             status_, data_ = auth_email(user)
-            refresh = RefreshToken.for_user(user=user)
-            access = refresh.access_token
-            data = {
-                "user": serializer.data,
-                "tokens": {
-                    "refresh": refresh,
-                    "access": access
-                }
-            }
-            serializer = UserSerializer(user)
-            return Response(status=status.HTTP_201_CREATED, data=data)
+            return Response(status=status.HTTP_201_CREATED, data=data_)
 
     def get(self, request, code=None, format=None):
         if code is None:
@@ -75,17 +64,16 @@ class MagicLinkView(APIView):
         if magic_link.is_expired():
             return Response(status=status.HTTP_401_UNAUTHORIZED, data={"detail": "The Token is expired, ask for another one"})
         refresh = RefreshToken.for_user(magic_link.user)
-        print(magic_link.user)
         serializer = UserSerializer(magic_link.user)
         magic_link.user.is_verified = True
         magic_link.user.save()
 
         data = {
+            "user": serializer.data,
             "tokens": {
                 "refresh": str(refresh),
                 "access": str(refresh.access_token)
             },
-            "user": serializer.data
         }
         return Response(status=status.HTTP_200_OK, data=data)
 
