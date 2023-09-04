@@ -6,4 +6,4 @@ Hi Dear user {{ username }},
     your code is : {{ code }}
 {% endif%}
 to access your account
-this link will expire in {{ expire_in_minutes }}  
+this link will expire in {{ expire_in_minutes }}

@@ -1,5 +1,6 @@
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from rest_framework import serializers
+
 from api.responses import ERROR_MESSAGES
 
 
@@ -17,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
         if get_user_model().objects.exclude(id=user.id).filter(email=value).exists():
             raise serializers.ValidationError(ERROR_MESSAGES["already_exists"])
         return value
-    
+
     def validate_username(self, value):
         user = self.context["request"].user
         if get_user_model().objects.exclude(id=user.id).filter(username=value).exists():

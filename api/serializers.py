@@ -1,4 +1,5 @@
-from rest_framework import serializers, exceptions
+from rest_framework import exceptions, serializers
+
 from .models import Period, Person, Purchase, PurchaseMembership
 from .responses import ERROR_MESSAGES
 
@@ -69,7 +70,9 @@ class PeriodSerializer(serializers.ModelSerializer):
                 persons_in_purchases.add(purchase_membership.person)
             persons_in_purchases.add(periods_purchase.buyer)
         if not persons_in_purchases.issubset(set(persons)):
-            raise serializers.ValidationError({"persons": ERROR_MESSAGES["person_object_protected"]})
+            raise serializers.ValidationError(
+                {"persons": ERROR_MESSAGES["person_object_protected"]}
+            )
         instance.persons.set(persons)
         instance.save()
         return instance
@@ -100,7 +103,15 @@ class PurchaseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Purchase
-        fields = ("id", "name", "date_and_time", "expense", "buyer", "purchased_for_users", "period")
+        fields = (
+            "id",
+            "name",
+            "date_and_time",
+            "expense",
+            "buyer",
+            "purchased_for_users",
+            "period",
+        )
 
     def validate_name(self, value):
         request = self.context.get("request")
@@ -134,9 +145,13 @@ class PurchaseSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
-        persons = attrs["period"].persons.all()  # all persons tha are related to this period
+        persons = attrs[
+            "period"
+        ].persons.all()  # all persons tha are related to this period
         if attrs.get("buyer") not in persons:
-            raise serializers.ValidationError({"buyer": ERROR_MESSAGES["not_period_member"]})
+            raise serializers.ValidationError(
+                {"buyer": ERROR_MESSAGES["not_period_member"]}
+            )
         for user_data in attrs.get("purchased_for_users"):
             if user_data.get("person") not in persons:
                 raise serializers.ValidationError(ERROR_MESSAGES["not_period_member"])
@@ -149,7 +164,7 @@ class PurchaseSerializer(serializers.ModelSerializer):
             membership = PurchaseMembership(
                 coefficient=person_data.get("coefficient"),
                 purchase=purchase,
-                person=person_data.get("person")
+                person=person_data.get("person"),
             )
             membership.save()
         return purchase
@@ -158,7 +173,9 @@ class PurchaseSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         buyer_serializer = PersonSerializer(instance.buyer)
         period_serializer = PeriodSerializer(instance.period)
-        purchased_for_users_serializer = PurchaseMemberShipSerializerForRead(instance.purchased_for_users.all(), many=True)
+        purchased_for_users_serializer = PurchaseMemberShipSerializerForRead(
+            instance.purchased_for_users.all(), many=True
+        )
         representation["buyer"] = buyer_serializer.data
         representation["period"] = period_serializer.data
         representation["purchased_for_users"] = purchased_for_users_serializer.data
@@ -167,19 +184,23 @@ class PurchaseSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.name = validated_data.get("name", instance.name)
-        instance.date_and_time = validated_data.get("date_and_time", instance.date_and_time)
+        instance.date_and_time = validated_data.get(
+            "date_and_time", instance.date_and_time
+        )
         instance.expense = validated_data.get("expense", instance.expense)
         instance.buyer = validated_data.get("buyer", instance.buyer)
         for user_data in validated_data.get("purchased_for_users"):
             try:
-                purchase_membership = PurchaseMembership.objects.get(purchase=instance, person=user_data.get("person"))
+                purchase_membership = PurchaseMembership.objects.get(
+                    purchase=instance, person=user_data.get("person")
+                )
                 purchase_membership.coefficient = user_data.get("coefficient")
                 purchase_membership.save()
             except PurchaseMembership.DoesNotExist:
                 purchase_membership = PurchaseMembership.objects.create(
                     coefficient=user_data.get("coefficient"),
                     person=user_data.get("person"),
-                    purchase=instance
+                    purchase=instance,
                 )
         instance.save()
         return instance

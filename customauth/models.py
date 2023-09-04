@@ -1,17 +1,23 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser
 import secrets
-from config.settings import AUTH_CODE_EXPIRES_IN
-from django.utils import timezone
-from api.utils import generate_id
-from django.contrib.auth.validators import UnicodeUsernameValidator
+
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.db import models
+from django.utils import timezone
+
+from api.utils import generate_id
+from config.settings import AUTH_CODE_EXPIRES_IN
 
 
 class User(AbstractUser):
-    id = models.SlugField(max_length=100, default=generate_id, unique=True, primary_key=True)
+    id = models.SlugField(
+        max_length=100, default=generate_id, unique=True, primary_key=True
+    )
     email = models.EmailField(blank=False, null=False, unique=True)
-    username = models.CharField(unique=True, max_length=250, validators=[UnicodeUsernameValidator()])
+    username = models.CharField(
+        unique=True, max_length=250, validators=[UnicodeUsernameValidator()]
+    )
 
 
 class Verification(models.Model):

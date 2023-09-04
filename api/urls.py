@@ -1,6 +1,8 @@
 from django.urls import include, path
-from .views import PeriodViewSet, PersonViewSet, PurchaseViewSet
 from rest_framework.routers import SimpleRouter
+
+from .views import PeriodViewSet, PersonViewSet, PurchaseViewSet
+
 app_name = "api"
 
 router = SimpleRouter()
