@@ -8,6 +8,7 @@ from config.settings import (APP_NAME, AUTH_CODE_EXPIRES_IN, EMAIL_HOST_USER,
                              EMAIL_PLAINTEXT_TEMPLATE_NAME, VERIFICATION_PATH)
 
 from .models import Verification
+from api.responses import ERROR_MESSAGES, RESPONSE_MESSAGES
 
 
 def auth_email(user):
@@ -16,7 +17,7 @@ def auth_email(user):
     subject = f"Verify its you in '{APP_NAME}'"
     if Verification.objects.filter(user=user, expire_at__gt=timezone.now()).exists():
         return status.HTTP_408_REQUEST_TIMEOUT, {
-            "detail": "You asked for a login link recently, Please wait after you can get new one!"
+            "detail": ERROR_MESSAGES["login_link_timeout"]
         }
 
     code = Verification.objects.create(user=user).code
@@ -33,4 +34,4 @@ def auth_email(user):
     )
     msg.attach_alternative(html_context, "text/html")
     msg.send(fail_silently=False)
-    return status.HTTP_200_OK, {"detail": "magic link has been sent to your email"}
+    return status.HTTP_200_OK, {"detail": RESPONSE_MESSAGES["magic_link_sent"]}
