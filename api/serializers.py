@@ -1,4 +1,8 @@
+from typing import Any
+
 from rest_framework import exceptions, serializers
+
+from config.settings import PERIOD_OBJECT_LIMIT
 
 from .models import Period, Person, Purchase, PurchaseMembership
 from .responses import ERROR_MESSAGES
@@ -52,6 +56,15 @@ class PeriodSerializer(serializers.ModelSerializer):
                 raise exceptions.PermissionDenied()
 
         return value
+
+    def validate(self, attrs: Any) -> Any:
+        request = self.context["request"]
+        if request.method == "POST":
+            if Period.objects.filter(owner=request.user).count() >= PERIOD_OBJECT_LIMIT:
+                raise serializers.ValidationError(
+                    ERROR_MESSAGES["period_limit_reached"]
+                )
+        return attrs
 
     def create(self, validated_data):
         owner = self.context.get("request").user

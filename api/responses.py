@@ -11,6 +11,9 @@ ERROR_MESSAGES = {
     "already_exists": _(
         "user with this email or username is already exists, try another one."
     ),
+    "period_limit_reached": _(
+        "You have reached maximum amount of period creation, delete some period to make new periods."
+    ),
 }
 
 RESPONSE_MESSAGES = {"successfully_deleted": _("Deleted Successfully")}
