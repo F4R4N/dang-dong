@@ -33,6 +33,7 @@ DEBUG = True
 ALLOWED_HOSTS: list[str] = list(
     os.environ.get("ALLOWED_HOSTS", "127.0.0.1").split(", ")
 )
+print(ALLOWED_HOSTS)
 
 # Application definition
 
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
