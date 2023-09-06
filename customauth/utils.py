@@ -16,7 +16,7 @@ def auth_email(user):
     subject = f"Verify its you in '{APP_NAME}'"
     if Verification.objects.filter(user=user, expire_at__gt=timezone.now()).exists():
         return status.HTTP_408_REQUEST_TIMEOUT, {
-            "detail": "you asked for a magic_link recently wait after you can get new one"
+            "detail": "You asked for a login link recently, Please wait after you can get new one!"
         }
 
     code = Verification.objects.create(user=user).code
