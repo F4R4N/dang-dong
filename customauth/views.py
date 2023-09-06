@@ -43,6 +43,7 @@ class MagicLinkView(APIView):
     """register or log in the user with magic link"""
 
     permission_classes = (permissions.AllowAny,)
+    allowed_methods = ["post"]
 
     def post(self, request, format=None):
         serializer = MagicLinkSerializer(data=request.data)
@@ -61,6 +62,11 @@ class MagicLinkView(APIView):
             )
             status_, data_ = auth_email(user)
             return Response(status=status.HTTP_201_CREATED, data=data_)
+
+
+class MagicLinkVerifyView(APIView):
+    permission_classes = (permissions.AllowAny,)
+    allowed_methods = ["get"]
 
     def get(self, request, code=None, format=None):
         if code is None:
