@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -184,4 +185,7 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_PLAINTEXT_TEMPLATE_NAME = "email.txt"
 EMAIL_HTML_TEMPLATE_NAME = "email.html"
 
+
 PERIOD_OBJECT_LIMIT = 30
+
+CORS_ALLOW_ALL_ORIGINS = True
