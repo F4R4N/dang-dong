@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken  # type: ignore
 
 from api.permissions import IsAuthorizedUser
-from api.responses import RESPONSE_MESSAGES
+from api.responses import RESPONSE_MESSAGES, ERROR_MESSAGES
 
 from .models import Verification
 from .serializers import MagicLinkSerializer, UserSerializer
@@ -29,13 +29,13 @@ class LogoutView(APIView):
             token.blacklist()
 
             return Response(
-                status=status.HTTP_205_RESET_CONTENT, data={"detail": "logged out"}
+                status=status.HTTP_205_RESET_CONTENT, data={"detail": RESPONSE_MESSAGES["logged_out"]}
             )
 
         except Exception:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
-                data={"detail": "refresh_token is not valid"},
+                data={"detail": ERROR_MESSAGES["invalid_refresh_token"]},
             )
 
 
@@ -72,13 +72,13 @@ class MagicLinkVerifyView(APIView):
         if code is None:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
-                data={"detail": "required url argument 'code' is missing"},
+                data={"detail": ERROR_MESSAGES["code_argument_missing"]},
             )
         magic_link = get_object_or_404(Verification, code=code)
         if magic_link.is_expired():
             return Response(
                 status=status.HTTP_401_UNAUTHORIZED,
-                data={"detail": "The Token is expired, ask for another one"},
+                data={"detail": ERROR_MESSAGES["expired_token"]},
             )
         refresh = RefreshToken.for_user(magic_link.user)
         serializer = UserSerializer(magic_link.user)
