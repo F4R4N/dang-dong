@@ -15,7 +15,7 @@ ERROR_MESSAGES = {
         "You have reached maximum amount of period creation, delete some period to make new periods."
     ),
     "code_argument_missing": _("required url argument 'code' is missing"),
-    "invalid_refresh_token": _("refresh_token is not valid"),
+    "invalid_refresh_token": _("Refresh Token is not valid"),
     "expired_token": _("The Token is expired, ask for another one"),
     "login_link_timeout": _("You asked for a login link recently, Please wait after you can get new one!"),
 
