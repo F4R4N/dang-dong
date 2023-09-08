@@ -10,11 +10,11 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken  # type: ignore
 
 from api.permissions import IsAuthorizedUser
-from api.responses import RESPONSE_MESSAGES, ERROR_MESSAGES
+from api.responses import ERROR_MESSAGES, RESPONSE_MESSAGES
 
 from .models import Verification
 from .serializers import MagicLinkSerializer, UserSerializer
-from .utils import auth_email
+from .utils import send_magic_link_email
 
 
 class LogoutView(APIView):
@@ -29,7 +29,8 @@ class LogoutView(APIView):
             token.blacklist()
 
             return Response(
-                status=status.HTTP_205_RESET_CONTENT, data={"detail": RESPONSE_MESSAGES["logged_out"]}
+                status=status.HTTP_205_RESET_CONTENT,
+                data={"detail": RESPONSE_MESSAGES["logged_out"]},
             )
 
         except Exception:
@@ -52,7 +53,7 @@ class MagicLinkView(APIView):
         email = request.data["email"]
         try:
             user = get_user_model().objects.get(email=email)
-            status_, data_ = auth_email(user)
+            status_, data_ = send_magic_link_email(user)
             return Response(status=status_, data=data_)
         except get_user_model().DoesNotExist:
             user = get_user_model().objects.create(
@@ -60,7 +61,7 @@ class MagicLinkView(APIView):
                 username=secrets.token_urlsafe(16),
                 is_active=True,
             )
-            status_, data_ = auth_email(user)
+            status_, data_ = send_magic_link_email(user)
             return Response(status=status.HTTP_201_CREATED, data=data_)
 
 

@@ -3,15 +3,15 @@ from django.template.loader import get_template
 from django.utils import timezone
 from rest_framework import status
 
+from api.responses import ERROR_MESSAGES, RESPONSE_MESSAGES
 from config.settings import (APP_NAME, AUTH_CODE_EXPIRES_IN, EMAIL_HOST_USER,
                              EMAIL_HTML_TEMPLATE_NAME,
                              EMAIL_PLAINTEXT_TEMPLATE_NAME, VERIFICATION_PATH)
 
 from .models import Verification
-from api.responses import ERROR_MESSAGES, RESPONSE_MESSAGES
 
 
-def auth_email(user):
+def send_magic_link_email(user):
     plaintext = get_template(EMAIL_PLAINTEXT_TEMPLATE_NAME)
     html = get_template(EMAIL_HTML_TEMPLATE_NAME)
     subject = f"Verify its you in '{APP_NAME}'"

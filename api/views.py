@@ -183,7 +183,5 @@ class PurchaseViewSet(viewsets.ModelViewSet):
             },
         )
 
-    # TODO: ADD OBJECT CREATION LIMITATION FOR EACH USER
-    # TODO: ADD REQUEST LIMITATION FOR EACH USER
     # TODO: LOCALIZATION TRANSLATION
     # TODO: TEST
