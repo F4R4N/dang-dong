@@ -95,7 +95,7 @@ class MagicLinkVerifyView(APIView):
 
 class UserViewSet(
     mixins.UpdateModelMixin,
-    mixins.DestroyModelMixin,
+    # mixins.DestroyModelMixin,
     mixins.ListModelMixin,
     viewsets.GenericViewSet,
 ):
@@ -107,13 +107,14 @@ class UserViewSet(
     def perform_update(self, serializer):
         serializer.save()
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance=instance)
-        return Response(
-            status=status.HTTP_204_NO_CONTENT,
-            data=RESPONSE_MESSAGES["successfully_deleted"],
-        )
+    # DELETE ACCOUNT IS DISABLED FOR USER DUE TO PROJECT MANAGER POLICY.
+    # def destroy(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     self.perform_destroy(instance=instance)
+    #     return Response(
+    #         status=status.HTTP_204_NO_CONTENT,
+    #         data=RESPONSE_MESSAGES["successfully_deleted"],
+    #     )
 
     def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         user = request.user
