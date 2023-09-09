@@ -102,7 +102,10 @@ class UserViewSet(
     queryset = get_user_model().objects.all()
     permission_classes = (permissions.IsAuthenticated, IsAuthorizedUser)
     serializer_class = UserSerializer
-    http_method_names = ["get", "put", "delete"]
+    http_method_names = [
+        "get",
+        "put",
+    ]  # "delete"]
 
     def perform_update(self, serializer):
         serializer.save()
