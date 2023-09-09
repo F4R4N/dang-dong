@@ -7,7 +7,7 @@ from django.db import models
 from django.utils import timezone
 
 from api.utils import generate_id
-from config.settings import AUTH_CODE_EXPIRES_IN
+from config.settings import AUTH_CODE_EXPIRES_IN, LANGUAGES
 
 
 class User(AbstractUser):
@@ -18,6 +18,7 @@ class User(AbstractUser):
     username = models.CharField(
         unique=True, max_length=250, validators=[UnicodeUsernameValidator()]
     )
+    preferred_language = models.CharField(max_length=10, choices=LANGUAGES, default="en")
 
 
 class Verification(models.Model):

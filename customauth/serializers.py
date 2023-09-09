@@ -24,7 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ("id", "username", "first_name", "last_name", "is_active", "email")
+        fields = ("id", "username", "first_name", "last_name", "is_active", "email", "preferred_language")
 
     def validate_email(self, value):
         """
@@ -56,5 +56,6 @@ class UserSerializer(serializers.ModelSerializer):
         instance.last_name = validated_data.get("last_name", instance.last_name)
         instance.email = validated_data.get("email", instance.email)
         instance.username = validated_data.get("username", instance.username)
+        instance.preferred_language = validated_data.get("preferred_language", instance.preferred_language)
         instance.save()
         return instance
