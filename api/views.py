@@ -1,19 +1,26 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import status, viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import mixins, status, viewsets
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from .models import Period, Person, Purchase
-from .permissions import IsOwner, IsPurchaseOwner
+from .models import Period, PeriodShare, Person, Purchase
+from .permissions import IsOwner, IsThroughPeriodRelatedOwner
 from .responses import ERROR_MESSAGES, RESPONSE_MESSAGES
-from .serializers import (DetailSerializer, PeriodSerializer, PersonSerializer,
-                          PurchaseSerializer, PurchaseSerializerForRead)
-from .utils import (get_dict_index, owe_and_credit_calculator,
-                    purchase_detail_calculator)
+from .serializers import (DetailSerializer, PeriodSerializer,
+                          PeriodShareSerializer, PersonSerializer,
+                          PurchaseSerializer)
+from .utils import calculate_period_detail, purchase_detail_calculator
 
 
-class PeriodViewSet(viewsets.ModelViewSet):
+class PeriodViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.RetrieveModelMixin,
+):
     """perform create, update, destroy, list, retrieve actions on period object"""
 
     queryset = Period.objects.all()
@@ -47,57 +54,17 @@ class PeriodViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None):
         """return detailed data about the period with the given id. including period info, purchases info and expenses detail."""
         period = get_object_or_404(Period, pk=pk)
-        all_periods_purchases = period.purchase_set.all()
-        period_detail: list[dict[str, object | int | dict[str, int | object]]] = []
-        for purchase in all_periods_purchases:
-            purchase_detail_calculator_result = purchase_detail_calculator(
-                purchase=purchase
-            )
-            for person_detail in purchase_detail_calculator_result:
-                if any(
-                    element["person"] == person_detail["person"]
-                    for element in period_detail
-                ):  # True when person exist in period_detail (update())
-                    index = get_dict_index(
-                        period_detail, "person", person_detail["person"]
-                    )
-                    period_detail[index].update(
-                        {
-                            "direct_cost": period_detail[index]["direct_cost"]
-                            + person_detail["direct_cost"],
-                            "final_cost": period_detail[index]["final_cost"]
-                            + person_detail["final_cost"],
-                            "owe_to": period_detail[index]["owe_to"]
-                            + person_detail["owe_to"],
-                            "creditor_of": period_detail[index]["creditor_of"]
-                            + person_detail["creditor_of"],
-                        }
-                    )
-                else:
-                    period_detail.append(person_detail)
-        for detail in period_detail:
-            owe_tos = owe_and_credit_calculator(detail["owe_to"])
-            creditor_ofs = owe_and_credit_calculator(detail["creditor_of"])
-            period_detail[period_detail.index(detail)].update({"owe_to": owe_tos})
-            period_detail[period_detail.index(detail)].update(
-                {"creditor_of": creditor_ofs}
-            )
-        detail_serializer = DetailSerializer(period_detail, many=True)
-        period_serializer = PeriodSerializer(period)
-        purchase_serializer = PurchaseSerializerForRead(
-            all_periods_purchases, many=True
-        )
-        return Response(
-            status=status.HTTP_200_OK,
-            data={
-                "period": period_serializer.data,
-                "all_purchases": purchase_serializer.data,
-                "detail": detail_serializer.data,
-            },
-        )
+        data = calculate_period_detail(period)
+        return Response(status=status.HTTP_200_OK, data=data)
 
 
-class PersonViewSet(viewsets.ModelViewSet):
+class PersonViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+):
     queryset = Person.objects.all()
     permission_classes = (IsAuthenticated, IsOwner)
     serializer_class = PersonSerializer
@@ -125,9 +92,16 @@ class PersonViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
-class PurchaseViewSet(viewsets.ModelViewSet):
+class PurchaseViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.RetrieveModelMixin,
+):
     queryset = Purchase.objects.all()
-    permission_classes = (IsAuthenticated, IsPurchaseOwner)
+    permission_classes = (IsAuthenticated, IsThroughPeriodRelatedOwner)
     serializer_class = PurchaseSerializer
     http_method_names = ["post", "get", "delete", "put"]
 
@@ -182,6 +156,58 @@ class PurchaseViewSet(viewsets.ModelViewSet):
                 "detail": purchase_detail_serializer.data,
             },
         )
+
+
+class PeriodShareViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+):
+    queryset = PeriodShare.objects.all()
+    permission_classes = [IsAuthenticated, IsThroughPeriodRelatedOwner]
+    serializer_class = PeriodShareSerializer
+    http_method_names = ["get", "put", "post", "delete"]
+
+    def perform_create(self, serializer) -> None:
+        serializer.save()
+
+    def perform_update(self, serializer) -> None:
+        serializer.save()
+
+    def list(self, request: Request) -> Response:
+        period_share = PeriodShare.objects.filter(period__owner=request.user)
+        serializer = self.get_serializer(period_share, many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+    def destroy(self, request: Request, pk=None) -> Response:
+        instance = self.get_object()
+        self.perform_destroy(instance=instance)
+        return Response(
+            status=status.HTTP_204_NO_CONTENT,
+            data={"detail": RESPONSE_MESSAGES["successfully_deleted"]},
+        )
+
+
+class PeriodShareViewSetRetrieve(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    queryset = PeriodShare.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = PeriodShareSerializer
+    http_method_names = ["get"]
+
+    def retrieve(self, request: Request, pk=None) -> Response:
+        try:
+            instance = PeriodShare.objects.get(sharing_id=pk)
+            if instance.is_expired():
+                raise PeriodShare.DoesNotExist
+            data = calculate_period_detail(instance.period)
+            return Response(status=status.HTTP_200_OK, data=data)
+        except PeriodShare.DoesNotExist:
+            return Response(
+                status=status.HTTP_401_UNAUTHORIZED,
+                data={"detail": ERROR_MESSAGES["invalid_sharing_link"]},
+            )
 
     # TODO: LOCALIZATION TRANSLATION
     # TODO: TEST

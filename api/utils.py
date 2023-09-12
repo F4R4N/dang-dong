@@ -1,16 +1,13 @@
-import secrets
 from typing import TYPE_CHECKING
 
 from django.apps import apps  # type: ignore
 from django.db.models import Sum  # type: ignore
 
+from .serializers import (DetailSerializer, PeriodSerializer,
+                          PurchaseSerializerForRead)
+
 if TYPE_CHECKING:
     from .models import Purchase
-
-
-def generate_id() -> str:
-    """generates a url-safe token to use as id in models."""
-    return secrets.token_urlsafe(16)
 
 
 def purchase_detail_data_generator(
@@ -140,3 +137,45 @@ def owe_and_credit_calculator(
         else:
             data.append(owe_or_credit)
     return data
+
+
+def calculate_period_detail(period):
+    all_periods_purchases = period.purchase_set.all()
+    period_detail: list[dict[str, object | int | dict[str, int | object]]] = []
+    for purchase in all_periods_purchases:
+        purchase_detail_calculator_result = purchase_detail_calculator(
+            purchase=purchase
+        )
+        for person_detail in purchase_detail_calculator_result:
+            if any(
+                element["person"] == person_detail["person"]
+                for element in period_detail
+            ):  # True when person exist in period_detail (update())
+                index = get_dict_index(period_detail, "person", person_detail["person"])
+                period_detail[index].update(
+                    {
+                        "direct_cost": period_detail[index]["direct_cost"]
+                        + person_detail["direct_cost"],
+                        "final_cost": period_detail[index]["final_cost"]
+                        + person_detail["final_cost"],
+                        "owe_to": period_detail[index]["owe_to"]
+                        + person_detail["owe_to"],
+                        "creditor_of": period_detail[index]["creditor_of"]
+                        + person_detail["creditor_of"],
+                    }
+                )
+            else:
+                period_detail.append(person_detail)
+    for detail in period_detail:
+        owe_tos = owe_and_credit_calculator(detail["owe_to"])
+        creditor_ofs = owe_and_credit_calculator(detail["creditor_of"])
+        period_detail[period_detail.index(detail)].update({"owe_to": owe_tos})
+        period_detail[period_detail.index(detail)].update({"creditor_of": creditor_ofs})
+    detail_serializer = DetailSerializer(period_detail, many=True)
+    period_serializer = PeriodSerializer(period)
+    purchase_serializer = PurchaseSerializerForRead(all_periods_purchases, many=True)
+    return {
+        "period": period_serializer.data,
+        "all_purchases": purchase_serializer.data,
+        "detail": detail_serializer.data,
+    }

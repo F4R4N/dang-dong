@@ -4,7 +4,7 @@ from rest_framework import exceptions, serializers
 
 from config.settings import PERIOD_OBJECT_LIMIT
 
-from .models import Period, Person, Purchase, PurchaseMembership
+from .models import Period, PeriodShare, Person, Purchase, PurchaseMembership
 from .responses import ERROR_MESSAGES
 
 
@@ -128,9 +128,6 @@ class PurchaseSerializer(serializers.ModelSerializer):
 
     def validate_name(self, value):
         request = self.context.get("request")
-        if request.method == "POST":
-            if Purchase.objects.filter(name=value, period__owner=request.user).exists():
-                raise serializers.ValidationError(ERROR_MESSAGES["unique_field"])
         if request.method == "PUT":
             instance = self._args[0]
             if instance.name != value:
@@ -158,6 +155,14 @@ class PurchaseSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
+        request = self.context["request"]
+        if request.method == "POST":
+            if Purchase.objects.filter(
+                name=attrs["name"], period=attrs["period"]
+            ).exists():
+                raise serializers.ValidationError(
+                    {"name": [ERROR_MESSAGES["unique_field"]]}
+                )
         persons = attrs[
             "period"
         ].persons.all()  # all persons tha are related to this period
@@ -230,3 +235,24 @@ class DetailSerializer(serializers.Serializer):
     direct_cost = serializers.IntegerField()
     final_cost = serializers.IntegerField()
     creditor_of = InDebtAndCreditedSerializer(many=True)
+
+
+class PeriodShareSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PeriodShare
+        fields = ("id", "period", "sharing_id", "expires_at", "is_expired")
+
+    def validate_period(self, value):
+        request = self.context["request"]
+        if request.user != value.owner:
+            raise exceptions.PermissionDenied()
+        return value
+
+    def create(self, validated_data: Any) -> Any:
+        return PeriodShare.objects.create(**validated_data)
+
+    def update(self, instance: Any, validated_data: Any) -> Any:
+        instance.period = validated_data.get("period", instance.period)
+        instance.expires_at = validated_data.get("expires_at", instance.expires_at)
+        instance.save()
+        return instance
