@@ -12,7 +12,7 @@ class IsOwner(permissions.BasePermission):
         return obj.owner == request.user
 
 
-class IsPurchaseOwner(permissions.BasePermission):
+class IsThroughPeriodRelatedOwner(permissions.BasePermission):
     """purchase object does not have owner field. this permission checks if
     purchases related periods owner is authenticated user or not.
     """
