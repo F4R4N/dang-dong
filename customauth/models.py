@@ -6,7 +6,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.utils import timezone
 
-from api.utils import generate_id
+from api.codes import generate_id
 from config.settings import AUTH_CODE_EXPIRES_IN, LANGUAGES
 
 
@@ -18,7 +18,9 @@ class User(AbstractUser):
     username = models.CharField(
         unique=True, max_length=250, validators=[UnicodeUsernameValidator()]
     )
-    preferred_language = models.CharField(max_length=10, choices=LANGUAGES, default="en")
+    preferred_language = models.CharField(
+        max_length=10, choices=LANGUAGES, default="en"
+    )
 
 
 class Verification(models.Model):
@@ -34,6 +36,4 @@ class Verification(models.Model):
         return super().save()
 
     def is_expired(self):
-        if self.expire_at > timezone.now():
-            return False
-        return True
+        return self.expire_at < timezone.now()
