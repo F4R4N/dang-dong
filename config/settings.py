@@ -146,6 +146,7 @@ LANGUAGES = [
     ("de", _("German")),
     ("en", _("English")),
     ("fa", _("Persian")),
+    ("es", _("Spanish"))
 ]
 
 REST_FRAMEWORK = {

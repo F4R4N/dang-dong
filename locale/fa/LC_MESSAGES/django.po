@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-08 19:01+0330\n"
+"POT-Creation-Date: 2023-09-12 17:36+0330\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: Faran Taghavi <farantgh@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: .\api\models.py:22 .\api\models.py:62
+#: .\api\models.py:22 .\api\models.py:62 .\api\models.py:87
 msgid "Id"
 msgstr "شناسه"
 
-#: .\api\models.py:29 .\api\models.py:69 .\api\models.py:104
+#: .\api\models.py:29 .\api\models.py:69 .\api\models.py:134
 msgid "Name"
 msgstr "نام"
 
@@ -38,35 +38,43 @@ msgstr "صاحب"
 msgid "Start Date"
 msgstr "تاریخ شروع"
 
-#: .\api\models.py:79 .\api\models.py:146
+#: .\api\models.py:79 .\api\models.py:176
 msgid "Person"
 msgstr "شخص"
 
-#: .\api\models.py:98 .\api\models.py:134
-msgid "id"
-msgstr "شناسه"
-
-#: .\api\models.py:106
-msgid "Date and Time"
-msgstr "تاریخ و زمان"
-
-#: .\api\models.py:108
-msgid "Expense"
-msgstr "هزینه"
-
-#: .\api\models.py:112
-msgid "Buyer"
-msgstr "خریدار"
-
-#: .\api\models.py:116
+#: .\api\models.py:97 .\api\models.py:146
 msgid "Period"
 msgstr "دوره"
 
-#: .\api\models.py:141
+#: .\api\models.py:102
+msgid "Sharing Id"
+msgstr ""
+
+#: .\api\models.py:106
+msgid "Expires At"
+msgstr ""
+
+#: .\api\models.py:128 .\api\models.py:164
+msgid "id"
+msgstr "شناسه"
+
+#: .\api\models.py:136
+msgid "Date and Time"
+msgstr "تاریخ و زمان"
+
+#: .\api\models.py:138
+msgid "Expense"
+msgstr "هزینه"
+
+#: .\api\models.py:142
+msgid "Buyer"
+msgstr "خریدار"
+
+#: .\api\models.py:171
 msgid "Coefficient"
 msgstr "ضریب"
 
-#: .\api\models.py:152
+#: .\api\models.py:182
 msgid "Purchase"
 msgstr "خرید"
 
@@ -87,43 +95,72 @@ msgid "You do not have permission to perform this action."
 msgstr "شما اجازه انجام این کار را ندارید."
 
 #: .\api\responses.py:9
-msgid "you cant remove these persons, some of the persons are part of purchases. try deleting person from that purchases and try again."
-msgstr "شما نمی توانید این شخص ها را حذف کنید، بعضی از این شخص ها بخشی از خرید ها هستند. سعی کنید از خرید ها شخص را حذف کنید و دوباره امتحان کنید."
+msgid ""
+"you cant remove these persons, some of the persons are part of purchases. "
+"try deleting person from that purchases and try again."
+msgstr ""
+"شما نمی توانید این شخص ها را حذف کنید، بعضی از این شخص ها بخشی از خرید ها "
+"هستند. سعی کنید از خرید ها شخص را حذف کنید و دوباره امتحان کنید."
 
 #: .\api\responses.py:12
 msgid "user with this email or username is already exists, try another one."
-msgstr "کاربری با این ایمیل یا نام کاربری قبلا وجود دارد، سعی کنید یکی دیگر را امتحان کنید."
+msgstr ""
+"کاربری با این ایمیل یا نام کاربری قبلا وجود دارد، سعی کنید یکی دیگر را "
+"امتحان کنید."
 
 #: .\api\responses.py:15
-msgid "You have reached maximum amount of period creation, delete some period to make new periods."
-msgstr "شما به حداکثر مقدار ایجاد دوره رسیده اید، برای ایجاد دوره های جدید بعضی از دوره ها را حذف کنید."
+msgid ""
+"You have reached maximum amount of period creation, delete some period to "
+"make new periods."
+msgstr ""
+"شما به حداکثر مقدار ایجاد دوره رسیده اید، برای ایجاد دوره های جدید بعضی از "
+"دوره ها را حذف کنید."
 
 #: .\api\responses.py:17
-msgid "required url argument 'code' is missing"
+#, fuzzy
+#| msgid "required url argument 'code' is missing"
+msgid "required url argument 'code' is missing."
 msgstr "پارامتر لازم url 'code' از دست رفته است"
 
 #: .\api\responses.py:18
-msgid "Refresh Token is not valid"
+#, fuzzy
+#| msgid "Refresh Token is not valid"
+msgid "Refresh Token is not valid."
 msgstr "توکن بازنشانی معتبر نیست"
 
 #: .\api\responses.py:19
-msgid "The Token is expired, ask for another one"
+#, fuzzy
+#| msgid "The Token is expired, ask for another one"
+msgid "The Token is expired, ask for another one."
 msgstr "توکن منقضی شده است، برای یکی دیگر درخواست کنید"
 
-#: .\api\responses.py:20
-msgid "You asked for a login link recently, Please wait after you can get new one!"
-msgstr "شما اخیرا یک پیوند ورود درخواست کرده اید، لطفا پس از انتظار بعد از اینکه می توانید یکی جدید دریافت کنید!"
+#: .\api\responses.py:21
+msgid ""
+"You asked for a login link recently, Please wait after you can get new one!"
+msgstr ""
+"شما اخیرا یک پیوند ورود درخواست کرده اید، لطفا پس از انتظار بعد از اینکه می "
+"توانید یکی جدید دریافت کنید!"
 
-#: .\api\responses.py:25
-msgid "Deleted Successfully"
-msgstr "با موفقیت حذف شد"
-
-#: .\api\responses.py:26
-msgid "logged out"
-msgstr "خارج شده است"
+#: .\api\responses.py:23
+msgid "Sharing Link is invalid or expired."
+msgstr ""
 
 #: .\api\responses.py:27
-msgid "magic link has been sent to your email"
+#, fuzzy
+#| msgid "Deleted Successfully"
+msgid "Deleted Successfully."
+msgstr "با موفقیت حذف شد"
+
+#: .\api\responses.py:28
+#, fuzzy
+#| msgid "logged out"
+msgid "logged out."
+msgstr "خارج شده است"
+
+#: .\api\responses.py:29
+#, fuzzy
+#| msgid "magic link has been sent to your email"
+msgid "magic link has been sent to your email."
 msgstr "پیوند جادویی به ایمیل شما ارسال شده است"
 
 #: .\config\settings.py:146
@@ -137,3 +174,7 @@ msgstr "انگلیسی"
 #: .\config\settings.py:148
 msgid "Persian"
 msgstr "فارسی"
+
+#: .\config\settings.py:149
+msgid "Spanish"
+msgstr ""
