@@ -4,7 +4,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from .utils import generate_id
+from .codes import generate_id, generate_period_sharing_id
 
 
 class Person(models.Model):
@@ -82,6 +82,36 @@ class Period(models.Model):
         return self.name
 
 
+class PeriodShare(models.Model):
+    id = models.SlugField(
+        verbose_name=_("Id"),
+        unique=True,
+        primary_key=True,
+        max_length=256,
+        editable=False,
+        default=generate_id,
+    )
+    period = models.ForeignKey(
+        Period,
+        on_delete=models.CASCADE,
+        verbose_name=_("Period"),
+    )
+    sharing_id = models.CharField(
+        unique=True,
+        default=generate_period_sharing_id,
+        verbose_name=_("Sharing Id"),
+        editable=False,
+        max_length=256,
+    )
+    expires_at = models.DateTimeField(verbose_name=_("Expires At"))
+
+    def __str__(self) -> str:
+        return str(self.period.name)
+
+    def is_expired(self) -> bool:
+        return self.expires_at < timezone.now()
+
+
 class Purchase(models.Model):
     """
     This model represents a Purchase. It contains information about the purchase such as its name, date and time, expense, buyer, and period.
@@ -151,6 +181,22 @@ class PurchaseMembership(models.Model):
         related_name="purchased_for_users",
         verbose_name=_("Purchase"),
     )
+    # direct_cost = models.PositiveBigIntegerField(default=0)
+    # final_cost = models.PositiveBigIntegerField(default=0)
 
     def __str__(self) -> str:
         return str(self.coefficient)
+
+
+# class OweAndCredit(models.Model):
+#     CHOICES = (
+#         ("owe_to", "Owe To"),
+#         ("creditor_of", "Creditor Of")
+#     )
+#     detail = models.ForeignKey(PurchaseMembership, on_delete=models.CASCADE)
+#     types = models.CharField(max_length=20, choices=CHOICES)
+#     person = models.ForeignKey(Person, on_delete=models.CASCADE)
+#     amount = models.PositiveBigIntegerField()
+
+#     def __str__(self):
+#         return str(self.person.name)
