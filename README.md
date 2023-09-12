@@ -6,3 +6,7 @@ dang dong app backend
 `poetry shell`
 
 `poetry run python manage.py runserver`
+
+`poetry run python manange.py makemigrations`
+
+`poetry run python manange.py migrate`
