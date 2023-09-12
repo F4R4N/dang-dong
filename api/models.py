@@ -168,11 +168,7 @@ class PurchaseMembership(models.Model):
         default=generate_id,
     )
     coefficient = models.IntegerField(
-        verbose_name=_("Coefficient"),
-        default=1,
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(1)],
+        verbose_name=_("Coefficient"), default=1, validators=[MinValueValidator(1)]
     )
     person = models.ForeignKey(
         Person,

@@ -180,7 +180,7 @@ class PurchaseSerializer(serializers.ModelSerializer):
         purchase = Purchase.objects.create(**validated_data)
         for person_data in purchased_for_users:
             membership = PurchaseMembership(
-                coefficient=person_data.get("coefficient"),
+                coefficient=person_data.get("coefficient", 1),
                 purchase=purchase,
                 person=person_data.get("person"),
             )
