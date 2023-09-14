@@ -96,7 +96,6 @@ class PurchaseViewSet(
     viewsets.GenericViewSet,
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
-    mixins.ListModelMixin,
     mixins.DestroyModelMixin,
     mixins.RetrieveModelMixin,
 ):
@@ -107,25 +106,6 @@ class PurchaseViewSet(
 
     def perform_create(self, serializer):
         serializer.save()
-
-    def list(self, request):
-        """
-        function is used to list all purchases associated with a given period.
-        """
-        if "period" not in request.data:
-            return Response(
-                status=status.HTTP_400_BAD_REQUEST,
-                data={"period": ERROR_MESSAGES["required_field"]},
-            )
-        period = get_object_or_404(Period, pk=request.data["period"])
-        if period.owner != request.user:
-            return Response(
-                status=status.HTTP_403_FORBIDDEN,
-                data=ERROR_MESSAGES["permission_denied"],
-            )
-        purchases = Purchase.objects.filter(period=period)
-        serializer = PurchaseSerializer(purchases, many=True)
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
 
     def perform_update(self, serializer):
         serializer.save()
@@ -156,6 +136,27 @@ class PurchaseViewSet(
                 "detail": purchase_detail_serializer.data,
             },
         )
+
+
+class RetrievePurchaseViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    queryset = Purchase.objects.all()
+    permission_classes = (IsAuthenticated, IsThroughPeriodRelatedOwner)
+    serializer_class = PurchaseSerializer
+    http_method_names = ["get"]
+
+    def retrieve(self, request, pk=None):
+        """
+        function is used to list all purchases associated with a given period.
+        """
+        period = get_object_or_404(Period, pk=pk)
+        if period.owner != request.user:
+            return Response(
+                status=status.HTTP_403_FORBIDDEN,
+                data=ERROR_MESSAGES["permission_denied"],
+            )
+        purchases = Purchase.objects.filter(period=period)
+        serializer = PurchaseSerializer(purchases, many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
 class PeriodShareViewSet(
