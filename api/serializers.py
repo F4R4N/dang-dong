@@ -237,6 +237,13 @@ class DetailSerializer(serializers.Serializer):
     creditor_of = InDebtAndCreditedSerializer(many=True)
 
 
+class GeneralInformationSerializer(serializers.Serializer):
+    person_count = serializers.IntegerField()
+    total_expenses = serializers.IntegerField()
+    average_cost_per_person = serializers.IntegerField()
+    purchase_count = serializers.IntegerField()
+
+
 class PeriodShareSerializer(serializers.ModelSerializer):
     class Meta:
         model = PeriodShare
