@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 from django.apps import apps  # type: ignore
 from django.db.models import Sum  # type: ignore
 
-from .serializers import (DetailSerializer, PeriodSerializer,
-                          PurchaseSerializerForRead, GeneralInformationSerializer)
+from .serializers import (DetailSerializer, GeneralInformationSerializer,
+                          PeriodSerializer, PurchaseSerializerForRead)
 
 if TYPE_CHECKING:
     from .models import Purchase
@@ -129,7 +129,9 @@ def owe_and_credit_calculator(
     """
     data: list[dict[str, object | int]] = []
     for owe_or_credit in owe_or_credits:
-        if any(element["person"] == owe_or_credit["person"] for element in data):  # should be implemented somewhere around here
+        if any(
+            element["person"] == owe_or_credit["person"] for element in data
+        ):  # should be implemented somewhere around here
             index: int = get_dict_index(data, "person", owe_or_credit["person"])
             data[index].update(
                 {"amount": data[index]["amount"] + owe_or_credit["amount"]}
