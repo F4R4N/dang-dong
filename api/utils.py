@@ -4,7 +4,7 @@ from django.apps import apps  # type: ignore
 from django.db.models import Sum  # type: ignore
 
 from .serializers import (DetailSerializer, PeriodSerializer,
-                          PurchaseSerializerForRead)
+                          PurchaseSerializerForRead, GeneralInformationSerializer)
 
 if TYPE_CHECKING:
     from .models import Purchase
@@ -129,7 +129,7 @@ def owe_and_credit_calculator(
     """
     data: list[dict[str, object | int]] = []
     for owe_or_credit in owe_or_credits:
-        if any(element["person"] == owe_or_credit["person"] for element in data):
+        if any(element["person"] == owe_or_credit["person"] for element in data):  # should be implemented somewhere around here
             index: int = get_dict_index(data, "person", owe_or_credit["person"])
             data[index].update(
                 {"amount": data[index]["amount"] + owe_or_credit["amount"]}
@@ -142,7 +142,9 @@ def owe_and_credit_calculator(
 def calculate_period_detail(period):
     all_periods_purchases = period.purchase_set.all()
     period_detail: list[dict[str, object | int | dict[str, int | object]]] = []
+    total_expenses = 0
     for purchase in all_periods_purchases:
+        total_expenses += purchase.expense
         purchase_detail_calculator_result = purchase_detail_calculator(
             purchase=purchase
         )
@@ -171,11 +173,20 @@ def calculate_period_detail(period):
         creditor_ofs = owe_and_credit_calculator(detail["creditor_of"])
         period_detail[period_detail.index(detail)].update({"owe_to": owe_tos})
         period_detail[period_detail.index(detail)].update({"creditor_of": creditor_ofs})
+    person_count = period.persons.count()
+    general_information = {
+        "person_count": person_count,
+        "total_expenses": total_expenses,
+        "average_cost_per_person": total_expenses / person_count,
+        "purchase_count": period.purchase_set.count(),
+    }
     detail_serializer = DetailSerializer(period_detail, many=True)
     period_serializer = PeriodSerializer(period)
     purchase_serializer = PurchaseSerializerForRead(all_periods_purchases, many=True)
+    general_information_serializer = GeneralInformationSerializer(general_information)
     return {
         "period": period_serializer.data,
+        "general_information": general_information_serializer.data,
         "all_purchases": purchase_serializer.data,
         "detail": detail_serializer.data,
     }
