@@ -24,12 +24,21 @@ class PersonSerializer(serializers.ModelSerializer):
         return Person.objects.create(**validated_data, owner=owner)
 
 
+class PurchaseMemberShipSerializerForRead(serializers.ModelSerializer):
+    person = PersonSerializer(read_only=True)
+
+    class Meta:
+        model = PurchaseMembership
+        fields = ("coefficient", "person")
+
+
 class PurchaseSerializerForRead(serializers.ModelSerializer):
     buyer = PersonSerializer()
+    purchased_for_users = PurchaseMemberShipSerializerForRead(many=True)
 
     class Meta:
         model = Purchase
-        fields = ("id", "buyer", "name", "expense", "date_and_time")
+        fields = ("id", "buyer", "name", "expense", "date_and_time", "purchased_for_users")
 
 
 class PeriodSerializer(serializers.ModelSerializer):
@@ -103,12 +112,6 @@ class PurchaseMemberShipSerializer(serializers.ModelSerializer):
         fields = ("id", "coefficient", "person")
 
 
-class PurchaseMemberShipSerializerForRead(serializers.ModelSerializer):
-    person = PersonSerializer(read_only=True)
-
-    class Meta:
-        model = PurchaseMembership
-        fields = ("coefficient", "person")
 
 
 class PurchaseSerializer(serializers.ModelSerializer):

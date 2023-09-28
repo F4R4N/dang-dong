@@ -111,7 +111,7 @@ def get_dict_index(lst: list, key: str, value: object) -> int:
     for index, dic in enumerate(lst):
         if dic[key] == value:
             return index
-    return -1
+    return False
 
 
 def owe_and_credit_calculator(
@@ -175,6 +175,21 @@ def calculate_period_detail(period):
         creditor_ofs = owe_and_credit_calculator(detail["creditor_of"])
         period_detail[period_detail.index(detail)].update({"owe_to": owe_tos})
         period_detail[period_detail.index(detail)].update({"creditor_of": creditor_ofs})
+
+    for i, detail in enumerate(period_detail):
+        for owe_index, owe in enumerate(detail["owe_to"]):
+            credit_index = get_dict_index(detail["creditor_of"], "person", owe["person"])
+            if credit_index is not False:
+                amount = detail["creditor_of"][credit_index]["amount"] - owe["amount"]
+                if amount > 0:
+                    period_detail[i]["owe_to"].pop(owe_index)
+                    period_detail[i]["creditor_of"][credit_index]["amount"] = amount
+                elif amount < 0:
+                    period_detail[i]["owe_to"][owe_index]["amount"] = amount
+                    period_detail[i]["creditor_of"].pop(credit_index)
+                else:
+                    period_detail[i]["owe_to"].pop(owe_index)
+                    period_detail[i]["creditor_of"].pop(credit_index)
     person_count = period.persons.count()
     general_information = {
         "person_count": person_count,
