@@ -10,6 +10,16 @@ from api.codes import generate_id
 from config.settings import AUTH_CODE_EXPIRES_IN, LANGUAGES
 
 
+class Role(models.Model):
+    id = models.SlugField(
+        max_length=100, default=generate_id, unique=True, primary_key=True
+    )
+    name = models.CharField(unique=True, max_length=250)
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class User(AbstractUser):
     id = models.SlugField(
         max_length=100, default=generate_id, unique=True, primary_key=True
@@ -21,6 +31,7 @@ class User(AbstractUser):
     preferred_language = models.CharField(
         max_length=10, choices=LANGUAGES, default="en"
     )
+    roles = models.ManyToManyField(Role, blank=True)
 
 
 class Verification(models.Model):

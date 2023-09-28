@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-
 from api.responses import ERROR_MESSAGES
 
 
@@ -24,7 +23,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ("id", "username", "first_name", "last_name", "is_active", "email", "preferred_language")
+        fields = ("id", "username", "first_name", "last_name", "is_active", "email", "preferred_language", "roles")
+        extra_kwargs = {
+            "roles": {"read_only": True}
+        }
 
     def validate_email(self, value):
         """
